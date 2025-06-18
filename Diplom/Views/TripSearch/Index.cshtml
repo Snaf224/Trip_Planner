@@ -1,0 +1,112 @@
+﻿@model Diplom.Models.TripSearch
+
+<div class="card shadow">
+    <div class="card-header">
+        <h2>Поиск и бронирование поездки</h2>
+    </div>
+    <div class="card-body">
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+
+        <h3>Заполните данные для поиска</h3>
+        <form asp-action="Search" method="post">
+            <div class="form-group">
+                <label>Ваше имя</label>
+                <input asp-for="Name" class="form-control" placeholder="Введите ваше имя" required />
+            </div>
+            <div class="form-group">
+                <label>Электронная почта</label>
+                <input asp-for="Email" type="email" class="form-control" placeholder="Введите вашу почту" required />
+            </div>
+            <div class="form-group">
+                <label>Дата поездки</label>
+                <input asp-for="TravelDate" type="date" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label>Бюджет</label>
+                <input asp-for="Budget" type="number" step="0.01" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label>Количество человек</label>
+                <input asp-for="NumberOfPeople" type="number" min="1" class="form-control" required />
+            </div>
+
+            <div class="d-flex align-items-center mt-3">
+                <button type="submit" class="btn btn-primary">Найти поездки</button>
+
+                <div class="text-muted small ms-3 d-flex align-items-center flex-wrap">
+                    @if (ViewBag.UpcomingTrips != null && ((List<Diplom.Models.Trip>)ViewBag.UpcomingTrips).Any())
+                    {
+                        <span>Предстоящие поездки:&nbsp;</span>
+                        @foreach (var trip in (List<Diplom.Models.Trip>)ViewBag.UpcomingTrips)
+                        {
+                            <span class="me-2">
+                                @trip.Name (@trip.StartDate.ToString("dd MMM") - @trip.EndDate.ToString("dd MMM"))
+                            </span>
+                        }
+                        <a href="@Url.Action("Index", "Trips")" class="small text-primary" style="text-decoration: underline;">
+                            подробнее
+                        </a>
+                    }
+                    else
+                    {
+                        <span>Нет предстоящих поездок</span>
+                    }
+                </div>
+            </div>
+        </form>
+
+        @if (ViewBag.AvailableTrips != null)
+        {
+            var trips = ViewBag.AvailableTrips as List<Diplom.Models.Trip>;
+            var searchModel = ViewBag.SearchModel as Diplom.Models.TripSearch;
+
+            <h3 class="mt-4">Доступные поездки</h3>
+            @if (trips.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Даты</th>
+                            <th>Бюджет</th>
+                            <th>Участники</th>
+                            <th>Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var trip in trips)
+                        {
+                            <tr>
+                                <td>@trip.Name</td>
+                                <td>@trip.StartDate.ToShortDateString() - @trip.EndDate.ToShortDateString()</td>
+                                <td>@trip.Budget</td>
+                                <td>@trip.Members.Count</td>
+                                <td>
+                                    <form asp-action="Book" method="post" style="display:inline;">
+                                        <input type="hidden" name="tripId" value="@trip.Id" />
+                                        <input type="hidden" name="userName" value="@searchModel.Name" />
+                                        <input type="hidden" name="userEmail" value="@searchModel.Email" />
+                                        <input type="hidden" name="numberOfPeople" value="@searchModel.NumberOfPeople" />
+                                        <button type="submit" class="btn btn-success">Забронировать</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>Нет доступных поездок, соответствующих вашим критериям.</p>
+            }
+        }
+    </div>
+</div>
