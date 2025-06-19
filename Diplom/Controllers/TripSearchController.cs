@@ -122,7 +122,7 @@ public class TripSearchController : Controller
 
         if (existingMembersCount == 0)
         {
-            message = $"Новый участник {userName} присоединился к поездке.";
+            message = $"Новый участник {userName} присоединился к поездке ({trip.Name}).";
         }
         else
         {
@@ -132,7 +132,7 @@ public class TripSearchController : Controller
                 _ => $" с {totalMembersCount - 1} людьми"
             };
 
-            message = $"Новый участник {userName} присоединился к поездке{joinedToText}.";
+            message = $"Новый участник {userName} присоединился к поездке{joinedToText} ({trip.Name}).";
         }
 
         // Создаем одно уведомление для всего трипа, чтобы не спамить
