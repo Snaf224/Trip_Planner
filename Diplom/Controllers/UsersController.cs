@@ -18,7 +18,10 @@ namespace Diplom.Controllers
 
         public IActionResult Index()
         {
-            var users = _userManager.Users.ToList();
+            var currentUserId = _userManager.GetUserId(User); // Получаем ID текущего пользователя
+            var users = _userManager.Users
+                .Where(u => u.Id != currentUserId) // Исключаем текущего пользователя
+                .ToList();
             return View(users);
         }
 
